@@ -1,0 +1,41 @@
+<h1 id="augmented-gridmaps-for-ros.">Augmented gridmaps for ROS.</h1>
+<p>For most robot mapping applications ROS utilizes the well known OccupancyGrid. Simple way to define arbitrary geometry maps with finite precision. However this format is really akward if you want or need to use for something else. Specifically dynamic updates to the map. That is by desing, ros map_server was created to provide a well stablished static map to other nodes. Not to modify it at run-time. In occassions it would be helpful to modify occupancy grids for the long run, for example if an unmapped obstacle has appeared on run-time.</p>
+<p>This small package was created to solve that issue, it allows to add, or augment obstacles to the map with obstacles on runtime and re-publish for the enhanced to the rest of interested nodes. This can be helpfull when these new obstacles are not gonna leave the robot workspace and you want you planner to avoid trying to get through them</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>This package was created with simplicity in mind. It only depends on core ROS libraries and messages so as long as you have a working ROS install it should work. This should also be quite compatible between ros versions, but was only tested on ros-melodic.</p>
+<h2 id="usage">Usage</h2>
+<p>This package only has one node: augmented_gridmaps_node. It reads from <code>/map</code> and publishes to <code>/augmented_map</code>.</p>
+<p>For now it only receives point-type obstacles or a given radius. These need to be published to <code>/point_obstacle</code> topic as PointStamped geometry msgs.</p>
+<p>To run a simple demo you can use the provide launch file:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">
+ <span class="ex">roslaunch</span> augmented_gridmaps augmented_gridmaps.launch </code></pre></div>
+<p>Thi is requires ros map server to run. From there you can use the <code>Publish point</code> button on rviz to dynamically add obstacles to the map.</p>
+<h2 id="nodes">Nodes</h2>
+<h3 id="augmented_gridmap_node">augmented_gridmap_node</h3>
+<p>Single entry point for the package, setups the enhanced map which contains the original map plus added obstacles.</p>
+<h4 id="subscribed-topics">Subscribed Topics</h4>
+<ul>
+<li><p>map (nav_msgs::OccupancyGrid)</p>
+<p>Original map to be augmented dynamically</p></li>
+<li><p>point_obstacle (geometry_msgs::PointStamped)</p>
+<p>Obstacle location as a point, radius is determined via parameters. Code internally checks it is on same frame as map but won't convert it itself</p></li>
+</ul>
+<h4 id="published-topics">Published Topics</h4>
+<ul>
+<li><p>augmented_map (nav_msgs::OccupancyGrid)</p>
+<p>Map with augmented obstacles, latched.</p></li>
+<li><p>augmented_map_metadata (nav_msgs::MapMetadata)</p>
+<p>Header info for map, for now it is the same as the original map But with different timestamp</p></li>
+<li><p>obstacle_markers (visualization_msgs::Marker)</p>
+<p>Visualization messages this displays obstacles as a small sphere on RVIZ</p></li>
+</ul>
+<h4 id="services">Services</h4>
+<ul>
+<li><p>clear_map (std_srvs::Empty)</p>
+<p>Removes all markers and osbtacles from the map and returns it to original state</p></li>
+</ul>
+<h4 id="parameters">Parameters</h4>
+<ul>
+<li><p>~radius (float, default: 0.05)</p>
+<p>Radius size for obstacle in meters</p></li>
+</ul>

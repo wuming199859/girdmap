@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="grid_folder" default="$(find augmented_gridmaps)/maps/"/>
+  <arg name="grid_name" default="$(arg grid_folder)map.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" output="screen" args="$(arg grid_name)"/>
+
+  <node name="map_enhancer" pkg="augmented_gridmaps" type="augmented_gridmaps_node" output="screen">
+    <remap from="point_obstacle" to="/clicked_point"/>
+    <param name="obstacle_radius" type="double" value="0.1"/>
+  </node>
+
+</launch>
